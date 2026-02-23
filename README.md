@@ -1,6 +1,6 @@
 # 🚦 Semáforo Inclusivo para Pessoas Surdas e Cegas 🌸
 
-## 💖 Uma Iniciativa do Grupo Feminino [Nome do Grupo]
+## 💖 Uma Iniciativa Inclusiva
 
 *Tecnologia com propósito, inclusão com estilo* ✨
 
@@ -8,7 +8,7 @@
 
 ## 📌 Sobre o Projeto
 
-Este projeto foi desenvolvido por um grupo de mulheres que uniram tecnologia e acessibilidade para criar um semáforo inclusivo utilizando Arduino, atendendo pessoas com deficiência visual e auditiva.
+Este projeto foi desenvolvido por um grupo que uniu tecnologia e acessibilidade para criar um semáforo inclusivo utilizando Arduino, atendendo pessoas com deficiência visual e auditiva.
 
 ---
 
@@ -133,13 +133,11 @@ Gerador de tons com padrões distintos para indicar diferentes fases da travessi
 
 Projeto desenvolvido por um grupo apaixonado por tecnologia e inclusão. Acreditamos que a tecnologia pode transformar vidas e construir um mundo mais acessível para todos.
 
-**Juntas, somos mais fortes.** 💪🌸
-
 ---
 
 ## 📝 Licença
 
-Open-source para fins educacionais e inclusivos. Créditos ao grupo feminino desenvolvedor.
+Open-source para fins educacionais e inclusivos.
 
 ---
 
