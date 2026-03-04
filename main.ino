@@ -24,12 +24,13 @@ int segF = A1;
 int segG = A2;
  
 // ===== TEMPOS =====
-unsigned long greenTime = 10000;
-unsigned long yellowTime = 2000;
+unsigned long greenTime;
+unsigned long yellowTime;
 unsigned long lastChange = 0;
  
 int state = 0;
 bool botaoPressionado = false;
+bool pedHdePico = false;
  
 // ===== DISPLAY =====
 int digits[10][7] = {
@@ -50,8 +51,8 @@ void setup() {
 Serial.begin(9600);
  
 if (!rtc.begin()) {
-   Serial.println("RTC NAO ENCONTRADO");
-   while (1);
+Serial.println("RTC NAO ENCONTRADO");
+while (1);
 }
  
 //rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); // usa só 1x!
@@ -85,100 +86,125 @@ void loop() {
  
 DateTime now = rtc.now();
 int hora = now.hour();
+bool horaDePico = (hora >=17 && hora<19 || hora>=07 && hora<09);
+ 
+if(horaDePico){
+greenTime = 9000;
+yellowTime = 3000;
+pedHdePico = true;
+}
+else{
+greenTime = 7000;
+yellowTime = 2000;
+pedHdePico = false;
+}
  
 bool modoNoturno = (hora >= 22 || hora < 6);
  
-// ===== 🌙 MODO NOTURNO =====
+// ===== MODO NOTURNO =====
 static unsigned long lastBlink = 0;
 static bool ledState = false;
  
 if (modoNoturno) {
  
-  digitalWrite(carGreen, LOW);
-  digitalWrite(carRed, LOW);
+digitalWrite(carGreen, LOW);
+digitalWrite(carRed, LOW);
  
-  // piscar sem travar
-  if (millis() - lastBlink >= 500) {
-    lastBlink = millis();
-    ledState = !ledState;
-    digitalWrite(carYellow, ledState);
-  }
+// piscar
+if (millis() - lastBlink >= 500) {
+lastBlink = millis();
+ledState = !ledState;
+digitalWrite(carYellow, ledState);
+}
  
-  // botão funcionando SEM delay
-  if (digitalRead(button) == HIGH) {
+// botão
+if (digitalRead(button) == HIGH) {
+//conf que apertou
+tone(buzzer, 1000);
+delay(100);
+noTone(buzzer);
  
-    digitalWrite(carYellow, LOW);
-    digitalWrite(carRed, HIGH);
+digitalWrite(carYellow, LOW);
+digitalWrite(carRed, HIGH);
+botaoPressionado= true;
+delay(2000);
+openPedestrian();
+botaoPressionado= false;
+delay(2000);
+digitalWrite(carRed, LOW);
+}
  
-    openPedestrian();
- 
-    digitalWrite(carRed, LOW);
-  }
- 
-  return;
+return;
 }
 else{
+ 
  
 // ===== MODO NORMAL =====
 unsigned long currentMillis = millis();
  
 if (digitalRead(button) == HIGH && state == 0) {
-   botaoPressionado = true;
+botaoPressionado = true;
+//conf que apertou
+tone(buzzer, 1000);
+delay(100);
+noTone(buzzer);
  
-   for(int i=0;i<3;i++){
-     digitalWrite(pedRed, LOW);
-     delay(100);
-     digitalWrite(pedRed, HIGH);
-     delay(100);
-   }
  
-   state = 1;
-   lastChange = currentMillis;
+for(int i=0;i<3;i++){
+digitalWrite(pedRed, LOW);
+delay(100);
+digitalWrite(pedRed, HIGH);
+delay(100);
+}
  
-   digitalWrite(carGreen, LOW);
-   digitalWrite(carYellow, HIGH);
+state = 1;
+lastChange = currentMillis;
+ 
+digitalWrite(carGreen, LOW);
+digitalWrite(carYellow, HIGH);
 }
  
 switch(state) {
  
 case 0:
-   if (currentMillis - lastChange >= greenTime) {
-     state = 1;
-     lastChange = currentMillis;
+if (currentMillis - lastChange >= greenTime) {
+state = 1;
+lastChange = currentMillis;
  
-     digitalWrite(carGreen, LOW);
-     digitalWrite(carYellow, HIGH);
-   }
+digitalWrite(carGreen, LOW);
+digitalWrite(carYellow, HIGH);
+}
 break;
  
 case 1:
-   if (currentMillis - lastChange >= yellowTime) {
-     state = 2;
-     lastChange = currentMillis;
+if (currentMillis - lastChange >= yellowTime) {
+state = 2;
+lastChange = currentMillis;
  
-     digitalWrite(carYellow, LOW);
-     digitalWrite(carRed, HIGH);
+digitalWrite(carYellow, LOW);
+digitalWrite(carRed, HIGH);
  
-     openPedestrian();
-   }
+openPedestrian();
+}
 break;
  
 case 2:
-   state = 0;
-   lastChange = millis();
+state = 0;
+lastChange = millis();
  
-   digitalWrite(carRed, LOW);
-   digitalWrite(carGreen, HIGH);
+digitalWrite(carRed, LOW);
+digitalWrite(carGreen, HIGH);
  
-   botaoPressionado = false;
+botaoPressionado = false;
 break;
 }
  
 if(state != 2){
-   clearDisplay();
+clearDisplay();
 }
 }
 }
+ 
 // ===== PEDESTRE =====
 void openPedestrian() {
  
@@ -186,33 +212,33 @@ digitalWrite(pedRed, LOW);
 digitalWrite(pedGreen, HIGH);
  
 int tempo = botaoPressionado ? 8 : 5;
- 
+if (pedHdePico) tempo=7;
 for (int i = tempo; i > 0; i--) {
  
-   showDigit(i);
+showDigit(i);
  
-   if (i > 2) {
-     tone(buzzer, 2000);
-     delay(300);
-     noTone(buzzer);
-     delay(700);
-   } else {
-     for (int j = 0; j < 4; j++) {
-       tone(buzzer, 2500);
-       digitalWrite(pedGreen, HIGH);
-       delay(125);
+if (i > 2) {
+tone(buzzer, 2000);
+delay(300);
+noTone(buzzer);
+delay(700);
+} else {
+for (int j = 0; j < 4; j++) {
+tone(buzzer, 2500);
+digitalWrite(pedGreen, HIGH);
+delay(125);
  
-       noTone(buzzer);
-       digitalWrite(pedGreen, LOW);
-       delay(125);
-     }
-   }
+noTone(buzzer);
+digitalWrite(pedGreen, LOW);
+delay(125);
+}
+}
  
-   if(i <= 2){
-     clearDisplay();
-     delay(100);
-     showDigit(i);
-   }
+if(i <= 2){
+clearDisplay();
+delay(100);
+showDigit(i);
+}
 }
  
 digitalWrite(pedGreen, LOW);
