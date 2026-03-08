@@ -4,7 +4,8 @@
 
 *Tecnologia com propósito, inclusão com estilo* 💙♿
 
-Assista ao vídeo do YouTube: https://youtu.be/bZWVnPVs4Pg 
+Assista ao vídeo do YouTube:
+https://youtu.be/LLgSQZXqBrA?si=M8V0kkRBXJ0o03g6 
 
 Este projeto foi desenvolvido por um grupo que uniu tecnologia e acessibilidade para criar um semáforo inclusivo utilizando Arduino, atendendo pessoas com deficiência visual e auditiva.
 
